@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, ActivityIndicator, StatusBar, SafeAreaView, TouchableOpacity, Modal, FlatList } from 'react-native';
+import { StyleSheet, Platform, Text, View, ScrollView, ActivityIndicator, StatusBar, SafeAreaView, TouchableOpacity, Modal, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, Amiri_400Regular } from '@expo-google-fonts/amiri';
 
@@ -57,7 +57,7 @@ export default function App() {
     pagesGroup[pNum].push(ayah);
   });
 
-  if (loading || !fontsLoaded) {
+  if (loading || (!fontsLoaded && Platform.OS !== 'web')) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#2e7d32" />
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   selectedSurahText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#8e0026',
     fontWeight: '600',
   },
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   arabicText: { 
-    fontFamily: 'QuranFont', 
+    fontFamily: Platform.OS === 'web' ? 'serif' : 'QuranFont',
     fontSize: 30, 
     textAlign: 'right', 
     lineHeight: 64, 
