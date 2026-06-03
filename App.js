@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   },
   englishNumberPrefix: {
     fontWeight: 'bold',
-    color: '#5b5968',
+    color: '#635968',
   },
   pageFooterSeparator: {
     flexDirection: 'row',
