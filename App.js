@@ -332,14 +332,14 @@ const styles = StyleSheet.create({
   },
   englishText: {
     fontSize: 15,
-    color: '#444',
+    color: '#000000',
     textAlign: 'left',
     lineHeight: 24,
     paddingHorizontal: 4,
   },
   englishNumberPrefix: {
     fontWeight: 'bold',
-    color: '#2e7d32',
+    color: '#5b5968',
   },
   pageFooterSeparator: {
     flexDirection: 'row',
