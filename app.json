@@ -19,22 +19,18 @@
       "package": "app.ma.quranapp"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-status-bar"
     ],
     "extra": {
       "eas": {
         "projectId": "dc1d1aba-2ad9-497f-b774-3f0091dd08b6"
       }
     },
-    "owner": "mohammedalamin",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/dc1d1aba-2ad9-497f-b774-3f0091dd08b6"
-    }
+    "owner": "mohammedalamin"
   }
 }

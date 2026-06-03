@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Platform, Text, View, ScrollView, ActivityIndicator, StatusBar, SafeAreaView, TouchableOpacity, Modal, FlatList } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, ActivityIndicator, StatusBar, SafeAreaView, TouchableOpacity, Modal, FlatList, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFonts, Amiri_400Regular } from '@expo-google-fonts/amiri';
-
+import { useFonts } from 'expo-font';
 // Import our local list of all 114 Surahs
 import { SURAH_LIST } from './surahs';
 
@@ -13,7 +12,8 @@ export default function App() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   let [fontsLoaded] = useFonts({
-    'QuranFont': Amiri_400Regular,
+    'hafs': require('./assets/Hafs.ttf'), // Hafs Arabic & Quran Font
+    'ScheherazadeReg': require('./assets/ScheherazadeReg.ttf'), // ScheherazadeReg-Regular
   });
 
   const activeSurah = SURAH_LIST.find(s => s.id === currentSurahId);
@@ -21,7 +21,7 @@ export default function App() {
   useEffect(() => {
     async function loadSurahData() {
       setLoading(true);
-      const cacheKey = `@surah_data_${currentSurahId}`;
+      const cacheKey = `@surah_data_v2_${currentSurahId}`; // Updated cache key to store translations safely
 
       try {
         const cachedData = await AsyncStorage.getItem(cacheKey);
@@ -30,12 +30,17 @@ export default function App() {
           setVerses(JSON.parse(cachedData));
           setLoading(false);
         } else {
-          const url = `https://api.quran.com/api/v4/verses/by_chapter/${currentSurahId}?fields=text_qpc_hafs,page_number&per_page=300`;
+          // Added &translations=131 to fetch Dr. Mustafa Khattab's "The Clear Quran"
+          const url = `https://api.quran.com/api/v4/verses/by_chapter/${currentSurahId}?fields=text_qpc_hafs,page_number&translations=131&per_page=300`;
           const response = await fetch(url);
           const data = await response.json();
           
-          await AsyncStorage.setItem(cacheKey, JSON.stringify(data.verses));
-          setVerses(data.verses);
+          if (data && data.verses) {
+            await AsyncStorage.setItem(cacheKey, JSON.stringify(data.verses));
+            setVerses(data.verses);
+          } else {
+            setVerses([]);
+          }
           setLoading(false);
         }
       } catch (err) {
@@ -57,7 +62,8 @@ export default function App() {
     pagesGroup[pNum].push(ayah);
   });
 
-  if (loading || (!fontsLoaded && Platform.OS !== 'web')) {
+  // Web-safe font loading checker
+  if (loading || !fontsLoaded) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#2e7d32" />
@@ -85,7 +91,7 @@ export default function App() {
         </View>
       </TouchableOpacity>
 
-      {/* Full Screen Safe Modal List Selection (Only shows when clicked) */}
+      {/* Full Screen Safe Modal List Selection */}
       <Modal
         visible={dropdownVisible}
         transparent={true}
@@ -130,7 +136,7 @@ export default function App() {
       {/* Main Content View */}
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         
-        {/* Nice Header View */}
+        {/* Header View */}
         <View style={styles.headerBadge}>
           <Text style={styles.headerSubtitle}>SURAH</Text>
           <Text style={styles.headerTitle}>{activeSurah ? activeSurah.name : ''}</Text>
@@ -148,14 +154,27 @@ export default function App() {
         {Object.keys(pagesGroup).map((pageNumber) => (
           <View key={pageNumber} style={styles.pageBlock}>
             
-            <View style={styles.versesTextWall}>
-              {pagesGroup[pageNumber].map((ayah) => (
-                <Text key={ayah.id} style={styles.arabicText}>
+            {/* For readable Translation layout, we loop stacked Ayah blocks */}
+            {pagesGroup[pageNumber].map((ayah) => (
+              <View key={ayah.id} style={styles.ayahRowContainer}>
+                
+                {/* Arabic Text Block */}
+                <Text style={styles.arabicText}>
                   {ayah.text_qpc_hafs} 
                   <Text style={styles.verseNumberBadge}> ﴿{ayah.verse_number}﴾ </Text>
                 </Text>
-              ))}
-            </View>
+
+                {/* English Translation Block */}
+                {ayah.translations && ayah.translations[0] && (
+                  <Text style={styles.englishText}>
+                    <Text style={styles.englishNumberPrefix}>{ayah.verse_number}. </Text>
+                    {/* Stripping out any accidental inline HTML tags from raw API text data */}
+                    {ayah.translations[0].text.replace(/<[^>]*>/g, '')}
+                  </Text>
+                )}
+                
+              </View>
+            ))}
 
             {/* Bottom Book Pagination */}
             <View style={styles.pageFooterSeparator}>
@@ -178,8 +197,6 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: '#f9f9f9' 
   },
-  
-  // ⚡ CUSTOM CONTAINER DIMENSIONS
   pickerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -189,10 +206,8 @@ const styles = StyleSheet.create({
     borderColor: '#e7e7e7',
     marginHorizontal: 12,
     borderRadius: 10,
-    
-    // Controlled tightly 
-    marginTop: 2,         // Slim margin at the top
-    height: 38,           // Reduced height container box
+    marginTop: 2,         
+    height: 38,           
     zIndex: 10,
     elevation: 3,
   },
@@ -210,16 +225,14 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   selectedSurahText: {
-    fontSize: 15,
-    color: '#8e0026',
+    fontSize: 14,
+    color: '#b90707',
     fontWeight: '600',
   },
   dropdownArrow: {
     fontSize: 10,
     color: '#2e7d32',
   },
-
-  // ⚡ MODAL OVERLAY STYLES (Keeps pages perfectly clean)
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
@@ -232,10 +245,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
     elevation: 5,
   },
   modalTitle: {
@@ -263,8 +272,6 @@ const styles = StyleSheet.create({
     color: '#2e7d32',
     fontWeight: 'bold',
   },
-
-  // MAIN LAYOUT
   container: { 
     flex: 1, 
     paddingHorizontal: 24,
@@ -277,7 +284,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8f5e9',
     borderRadius: 12,
     padding: 20,
-    marginTop: 8,        // Clean layout space beneath pickerContainer
+    marginTop: 8,        
     marginBottom: 10,
     alignItems: 'center',
     borderWidth: 1,
@@ -288,12 +295,12 @@ const styles = StyleSheet.create({
   headerNumber: { fontSize: 13, color: '#666', fontWeight: '500' },
 
   bismillahText: { 
-    fontFamily: 'QuranFont', 
+    fontFamily: 'hafs',
     fontSize: 34, 
     textAlign: 'center', 
     color: '#2e7d32', 
     marginVertical: 25, 
-    lineHeight: 50 
+    lineHeight: 52
   },
 
   pageBlock: {
@@ -304,30 +311,36 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f0f0f0',
     elevation: 1, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
   },
-  versesTextWall: {
-    flexDirection: 'row-reverse', 
-    flexWrap: 'wrap', 
-    justifyContent: 'flex-start',
-    paddingBottom: 20,
+  ayahRowContainer: {
+    marginBottom: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f7f7f7',
+    paddingBottom: 16,
   },
   arabicText: { 
-    fontFamily: Platform.OS === 'web' ? 'serif' : 'QuranFont',
-    fontSize: 30, 
+    fontFamily: 'hafs', 
+    fontSize: 28, 
     textAlign: 'right', 
-    lineHeight: 64, 
+    lineHeight: 60, 
     color: '#222',
+    marginBottom: 10,
   },
   verseNumberBadge: {
     fontSize: 18,
     color: '#2e7d32',
-    fontWeight: 'normal',
   },
-
+  englishText: {
+    fontSize: 15,
+    color: '#444',
+    textAlign: 'left',
+    lineHeight: 24,
+    paddingHorizontal: 4,
+  },
+  englishNumberPrefix: {
+    fontWeight: 'bold',
+    color: '#2e7d32',
+  },
   pageFooterSeparator: {
     flexDirection: 'row',
     alignItems: 'center',
