@@ -10,6 +10,9 @@ export default function App() {
   const [verses, setVerses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  // Settings Modal State (for future font selection or other preferences)
+  const [settingsVisible, setSettingsVisible] = useState(false);
+  const [selectedFont, setSelectedFont] = useState('hafs');
 
   let [fontsLoaded] = useFonts({
     'hafs': require('./assets/Hafs.ttf'), // Hafs Arabic & Quran Font
@@ -77,19 +80,36 @@ export default function App() {
       <StatusBar barStyle="dark-content" backgroundColor="#f9f9f9" />
 
       {/* Custom Sleek Dropdown Bar Selector */}
-      <TouchableOpacity 
-        style={styles.pickerContainer} 
-        onPress={() => setDropdownVisible(true)}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.pickerLabel}>Choose Surah:</Text>
-        <View style={styles.dropdownSelector}>
-          <Text style={styles.selectedSurahText}>
-            {activeSurah ? `${activeSurah.id}. ${activeSurah.name}` : 'Select Surah'}
-          </Text>
-          <Text style={styles.dropdownArrow}>▼</Text>
-        </View>
-      </TouchableOpacity>
+      
+      {/* Top Bar */}
+<View style={styles.topBar}>
+
+  {/* Surah Selector */}
+  <TouchableOpacity
+    style={styles.pickerContainer}
+    onPress={() => setDropdownVisible(true)}
+    activeOpacity={0.8}
+  >
+    <Text style={styles.pickerLabel}>Choose Surah:</Text>
+
+    <View style={styles.dropdownSelector}>
+      <Text style={styles.selectedSurahText}>
+        {activeSurah ? `${activeSurah.id}. ${activeSurah.name}` : 'Select Surah'}
+      </Text>
+
+      <Text style={styles.dropdownArrow}>▼</Text>
+    </View>
+  </TouchableOpacity>
+
+  {/* Settings Button */}
+  <TouchableOpacity
+    style={styles.settingsButton}
+    onPress={() => setSettingsVisible(true)}
+  >
+    <Text style={styles.settingsIcon}>⚙</Text>
+  </TouchableOpacity>
+
+</View>
 
       {/* Full Screen Safe Modal List Selection */}
       <Modal
@@ -132,7 +152,52 @@ export default function App() {
           </View>
         </TouchableOpacity>
       </Modal>
+<Modal
+  visible={settingsVisible}
+  transparent={true}
+  animationType="fade"
+  onRequestClose={() => setSettingsVisible(false)}
+>
+  <TouchableOpacity
+    style={styles.modalOverlay}
+    activeOpacity={1}
+    onPress={() => setSettingsVisible(false)}
+  >
+    <View style={styles.settingsModal}>
+      <Text style={styles.modalTitle}>Choose Arabic Font</Text>
 
+      <TouchableOpacity
+        style={[
+          styles.fontOption,
+          selectedFont === 'hafs' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('hafs');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+          Hafs Font
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[
+          styles.fontOption,
+          selectedFont === 'ScheherazadeReg' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('ScheherazadeReg');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+          Scheherazade Font
+        </Text>
+      </TouchableOpacity>
+    </View>
+  </TouchableOpacity>
+</Modal>
       {/* Main Content View */}
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         
@@ -145,7 +210,7 @@ export default function App() {
         
         {/* Output Bismillah Header if applicable */}
         {currentSurahId !== 1 && currentSurahId !== 9 ? (
-          <Text style={styles.bismillahText}>
+          <Text style={[styles.bismillahText,{ fontFamily: selectedFont }]}>
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
           </Text>
         ) : null}
@@ -159,7 +224,7 @@ export default function App() {
               <View key={ayah.id} style={styles.ayahRowContainer}>
                 
                 {/* Arabic Text Block */}
-                <Text style={styles.arabicText}>
+                <Text style={[styles.arabicText,{ fontFamily: selectedFont }]}>
                   {ayah.text_qpc_hafs} 
                   <Text style={styles.verseNumberBadge}> ﴿{ayah.verse_number}﴾ </Text>
                 </Text>
@@ -204,7 +269,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: '#e7e7e7',
-    marginHorizontal: 12,
+    // marginHorizontal: 12,
+    flex: 1,
     borderRadius: 10,
     marginTop: 2,         
     height: 38,           
@@ -360,4 +426,46 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.5,
   },
+  topBar: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingHorizontal: 12,
+  marginTop: 4,
+},
+
+settingsButton: {
+  width: 42,
+  height: 38,
+  marginLeft: 8,
+  borderRadius: 10,
+  backgroundColor: '#fff',
+  borderWidth: 1,
+  borderColor: '#e7e7e7',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+settingsIcon: {
+  fontSize: 18,
+},
+
+settingsModal: {
+  width: '80%',
+  backgroundColor: '#fff',
+  borderRadius: 16,
+  padding: 20,
+},
+
+fontOption: {
+  padding: 16,
+  borderRadius: 12,
+  borderWidth: 1,
+  borderColor: '#e5e5e5',
+  marginTop: 12,
+},
+
+fontOptionSelected: {
+  backgroundColor: '#e8f5e9',
+  borderColor: '#2e7d32',
+},
 });
