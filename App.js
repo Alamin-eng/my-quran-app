@@ -21,6 +21,7 @@ export default function App() {
     'PFNuyorkArabicRegular': require('./assets/PFNuyorkArabicRegular.ttf'), // PF Nuyork Arabic Regular Font  
     'MuhammadiQuranicFont': require('./assets/MuhammadiQuranic.ttf'), // Muhammadi Quranic Font
     'Tajawal-Regular': require('./assets/Tajawal-Regular.ttf'), // Tajawal Regular Font
+    'AmiriQuranColored': require('./assets/AmiriQuranColored.ttf'), // Amiri Quran Colored Font
   });
 
   const activeSurah = SURAH_LIST.find(s => s.id === currentSurahId);
@@ -253,6 +254,20 @@ export default function App() {
       >
         <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
           Tajawal Regular Font
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.fontOption,
+          selectedFont === 'AmiriQuranColored' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('AmiriQuranColored');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+          Amiri Quran Colored Font
         </Text>
       </TouchableOpacity>
     </View>
