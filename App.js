@@ -16,7 +16,8 @@ export default function App() {
 
   let [fontsLoaded] = useFonts({
     'hafs': require('./assets/Hafs.ttf'), // Hafs Arabic & Quran Font
-    'ScheherazadeReg': require('./assets/ScheherazadeReg.ttf'), // ScheherazadeReg-Regular
+    'ScheherazadeReg': require('./assets/ScheherazadeReg.ttf'), //ScheherazadeReg-Regular
+    'ArabicFont': require('./assets/ArabicTransparentRegular.ttf'), // Arabic Font (for future expansion)    
   });
 
   const activeSurah = SURAH_LIST.find(s => s.id === currentSurahId);
@@ -193,6 +194,20 @@ export default function App() {
       >
         <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
           Scheherazade Font
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.fontOption,
+          selectedFont === 'ArabicFont' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('ArabicFont');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+          Arabic Font
         </Text>
       </TouchableOpacity>
     </View>
