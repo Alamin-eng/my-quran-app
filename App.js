@@ -19,6 +19,8 @@ export default function App() {
     'ScheherazadeReg': require('./assets/ScheherazadeReg.ttf'), //ScheherazadeReg-Regular
     'ArabicFont': require('./assets/ArabicTransparentRegular.ttf'), // Arabic transparent regular Font  
     'PFNuyorkArabicRegular': require('./assets/PFNuyorkArabicRegular.ttf'), // PF Nuyork Arabic Regular Font  
+    'MuhammadiQuranicFont': require('./assets/MuhammadiQuranic.ttf'), // Muhammadi Quranic Font
+    'Tajawal-Regular': require('./assets/Tajawal-Regular.ttf'), // Tajawal Regular Font
   });
 
   const activeSurah = SURAH_LIST.find(s => s.id === currentSurahId);
@@ -222,7 +224,35 @@ export default function App() {
         }}
       >
         <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
-          PF Nuyork Arabic Regular Font
+          PF Nuyork Arabic Font
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.fontOption,
+          selectedFont === 'MuhammadiQuranicFont' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('MuhammadiQuranicFont');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+          Muhammadi Quranic Font
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.fontOption,
+          selectedFont === 'Tajawal-Regular' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('Tajawal-Regular');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+          Tajawal Regular Font
         </Text>
       </TouchableOpacity>
     </View>
