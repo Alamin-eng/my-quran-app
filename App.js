@@ -17,7 +17,8 @@ export default function App() {
   let [fontsLoaded] = useFonts({
     'hafs': require('./assets/Hafs.ttf'), // Hafs Arabic & Quran Font
     'ScheherazadeReg': require('./assets/ScheherazadeReg.ttf'), //ScheherazadeReg-Regular
-    'ArabicFont': require('./assets/ArabicTransparentRegular.ttf'), // Arabic Font (for future expansion)    
+    'ArabicFont': require('./assets/ArabicTransparentRegular.ttf'), // Arabic transparent regular Font  
+    'PFNuyorkArabicRegular': require('./assets/PFNuyorkArabicRegular.ttf'), // PF Nuyork Arabic Regular Font  
   });
 
   const activeSurah = SURAH_LIST.find(s => s.id === currentSurahId);
@@ -207,7 +208,21 @@ export default function App() {
         }}
       >
         <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
-          Arabic Font
+          Arabic Transparent Font
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.fontOption,
+          selectedFont === 'PFNuyorkArabicRegular' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('PFNuyorkArabicRegular');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+          PF Nuyork Arabic Regular Font
         </Text>
       </TouchableOpacity>
     </View>
