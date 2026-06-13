@@ -18,7 +18,8 @@ export default function App() {
     'hafs': require('./assets/Hafs.ttf'), // Hafs Arabic & Quran Font
     'ScheherazadeReg': require('./assets/ScheherazadeReg.ttf'), //ScheherazadeReg-Regular
     'ArabicFont': require('./assets/ArabicTransparentRegular.ttf'), // Arabic transparent regular Font  
-    'PFNuyorkArabicRegular': require('./assets/PFNuyorkArabicRegular.ttf'), // PF Nuyork Arabic Regular Font  
+    'PFNuyorkArabicRegular': require('./assets/PFNuyorkArabicRegular.ttf'), // PF Nuyork Arabic Regular Font 
+    'IndopakNastaleeq': require('./assets/IndopakNastaleeq.ttf'), // Indopak Nastaleeq Font
     'MuhammadiQuranicFont': require('./assets/MuhammadiQuranic.ttf'), // Muhammadi Quranic Font
     'Tajawal-Regular': require('./assets/Tajawal-Regular.ttf'), // Tajawal Regular Font
     'AmiriQuranColored': require('./assets/AmiriQuranColored.ttf'), // Amiri Quran Colored Font
@@ -183,7 +184,7 @@ export default function App() {
           setSettingsVisible(false);
         }}
       >
-        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
           Hafs Font
         </Text>
       </TouchableOpacity>
@@ -198,7 +199,7 @@ export default function App() {
           setSettingsVisible(false);
         }}
       >
-        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
           Scheherazade Font
         </Text>
       </TouchableOpacity>
@@ -212,8 +213,22 @@ export default function App() {
           setSettingsVisible(false);
         }}
       >
-        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
           Arabic Transparent Font
+        </Text>
+      </TouchableOpacity>
+       <TouchableOpacity
+        style={[
+          styles.fontOption,
+          selectedFont === 'IndopakNastaleeq' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('IndopakNastaleeq');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
+          Indopak Nastaleeq Font
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -226,7 +241,7 @@ export default function App() {
           setSettingsVisible(false);
         }}
       >
-        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
           PF Nuyork Arabic Font
         </Text>
       </TouchableOpacity>
@@ -240,7 +255,7 @@ export default function App() {
           setSettingsVisible(false);
         }}
       >
-        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
           Muhammadi Quranic Font
         </Text>
       </TouchableOpacity>
@@ -254,7 +269,7 @@ export default function App() {
           setSettingsVisible(false);
         }}
       >
-        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
           Tajawal Regular Font
         </Text>
       </TouchableOpacity>
@@ -268,7 +283,7 @@ export default function App() {
           setSettingsVisible(false);
         }}
       >
-        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
           Arab Quran Islamic2 Font
         </Text>
       </TouchableOpacity>
@@ -282,7 +297,7 @@ export default function App() {
           setSettingsVisible(false);
         }}
       >
-        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
           Amiri Quran Colored Font
         </Text>
       </TouchableOpacity>
@@ -296,7 +311,7 @@ export default function App() {
           setSettingsVisible(false);
         }}
       >
-        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+        <Text style={{ fontFamily: selectedFont, fontSize: 20 }}>
           Al-Qalam Quran Majeed 2 Font
         </Text>
       </TouchableOpacity>
