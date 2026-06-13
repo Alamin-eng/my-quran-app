@@ -22,6 +22,8 @@ export default function App() {
     'MuhammadiQuranicFont': require('./assets/MuhammadiQuranic.ttf'), // Muhammadi Quranic Font
     'Tajawal-Regular': require('./assets/Tajawal-Regular.ttf'), // Tajawal Regular Font
     'AmiriQuranColored': require('./assets/AmiriQuranColored.ttf'), // Amiri Quran Colored Font
+    'ArabQuranIslamic2': require('./assets/ArabQuranIslamic2.ttf'), // Arab Quran Islamic2 Font
+    'al-qalam-quran-majeed-2': require('./assets/al-qalam-quran-majeed-2.ttf'), // al-qalam-quran-majeed-2 Font 
   });
 
   const activeSurah = SURAH_LIST.find(s => s.id === currentSurahId);
@@ -259,6 +261,20 @@ export default function App() {
       <TouchableOpacity
         style={[
           styles.fontOption,
+          selectedFont === 'ArabQuranIslamic2' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('ArabQuranIslamic2');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+          Arab Quran Islamic2 Font
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.fontOption,
           selectedFont === 'AmiriQuranColored' && styles.fontOptionSelected
         ]}
         onPress={() => {
@@ -268,6 +284,20 @@ export default function App() {
       >
         <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
           Amiri Quran Colored Font
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.fontOption,
+          selectedFont === 'al-qalam-quran-majeed-2' && styles.fontOptionSelected
+        ]}
+        onPress={() => {
+          setSelectedFont('al-qalam-quran-majeed-2');
+          setSettingsVisible(false);
+        }}
+      >
+        <Text style={{ fontFamily: selectedFont, fontSize: 24 }}>
+          Al-Qalam Quran Majeed 2 Font
         </Text>
       </TouchableOpacity>
     </View>
