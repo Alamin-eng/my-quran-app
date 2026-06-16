@@ -570,10 +570,10 @@ settingsIcon: {
 },
 
 settingsModal: {
-  width: '80%',
+  width: '70%',
   backgroundColor: '#fff',
   borderRadius: 16,
-  padding: 20,
+  padding: 14,
 },
 
 fontOption: {
