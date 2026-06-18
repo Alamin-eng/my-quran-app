@@ -17,7 +17,6 @@ export default function App() {
   let [fontsLoaded] = useFonts({
     'hafs': require('./assets/Hafs.ttf'), // Hafs Arabic & Quran Font
     'ScheherazadeReg': require('./assets/ScheherazadeReg.ttf'), //ScheherazadeReg-Regular
-    'ArabicFont': require('./assets/ArabicTransparentRegular.ttf'), // Arabic transparent regular Font  
     'PFNuyorkArabicRegular': require('./assets/PFNuyorkArabicRegular.ttf'), // PF Nuyork Arabic Regular Font 
     'IndopakNastaleeq': require('./assets/IndopakNastaleeq.ttf'), // Indopak Nastaleeq Font
     'MuhammadiQuranicFont': require('./assets/MuhammadiQuranic.ttf'), // Muhammadi Quranic Font
@@ -203,20 +202,7 @@ export default function App() {
           Scheherazade Font
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={[
-          styles.fontOption,
-          selectedFont === 'ArabicFont' && styles.fontOptionSelected
-        ]}
-        onPress={() => {
-          setSelectedFont('ArabicFont');
-          setSettingsVisible(false);
-        }}
-      >
-        <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-          Arabic Transparent Font
-        </Text>
-      </TouchableOpacity>
+      
        <TouchableOpacity
         style={[
           styles.fontOption,
