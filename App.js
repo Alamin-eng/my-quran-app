@@ -172,6 +172,9 @@ export default function App() {
   >
     <View style={styles.settingsModal}>
       <Text style={styles.modalTitle}>Choose Arabic Font</Text>
+       <ScrollView
+      showsVerticalScrollIndicator={true}
+      contentContainerStyle={{ paddingBottom: 20 }}>
 
       <TouchableOpacity
         style={[
@@ -301,6 +304,7 @@ export default function App() {
           Al-Qalam Quran Majeed 2 Font
         </Text>
       </TouchableOpacity>
+      </ScrollView>
     </View>
   </TouchableOpacity>
 </Modal>
