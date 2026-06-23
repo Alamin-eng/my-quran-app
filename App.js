@@ -26,7 +26,7 @@ export default function App() {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [selectedFont, setSelectedFont] = useState("hafs");
 
- // AsyncStorage.removeItem("@english_translation"); // RUN ONCE TO FLUSH THE BAD CACHE DATA
+  // AsyncStorage.removeItem("@english_translation"); // RUN ONCE TO FLUSH THE BAD CACHE DATA
 
   let [fontsLoaded] = useFonts({
     hafs: require("./assets/Hafs.ttf"),
@@ -87,7 +87,7 @@ export default function App() {
       setLoading(true);
 
       // Distinct key to completely ignore old, malformed caches
-      const cacheKey = `@surah_cloud_final_v4_${currentSurahId}`; // Changed v3 to v4
+      const cacheKey = `@surah_cloud_final_v8_${currentSurahId}`; // Upgraded from v5 to v8
 
       try {
         const cachedData = await AsyncStorage.getItem(cacheKey);
