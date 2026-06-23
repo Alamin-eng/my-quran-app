@@ -10,63 +10,148 @@ import {
   TouchableOpacity,
   Modal,
   FlatList,
-  Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
 // Import our local list of all 114 Surahs
 import { SURAH_LIST } from "./surahs";
+const ENGLISH_CACHE_KEY = "@english_translation";
 
 export default function App() {
   const [currentSurahId, setCurrentSurahId] = useState(1);
   const [verses, setVerses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  // Settings Modal State (for future font selection or other preferences)
+  // Settings Modal State
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [selectedFont, setSelectedFont] = useState("hafs");
 
+ // AsyncStorage.removeItem("@english_translation"); // RUN ONCE TO FLUSH THE BAD CACHE DATA
+
   let [fontsLoaded] = useFonts({
-    hafs: require("./assets/Hafs.ttf"), // Hafs Arabic & Quran Font
-    ScheherazadeReg: require("./assets/ScheherazadeReg.ttf"), //ScheherazadeReg-Regular
-    PFNuyorkArabicRegular: require("./assets/PFNuyorkArabicRegular.ttf"), // PF Nuyork Arabic Regular Font
-    IndopakNastaleeq: require("./assets/IndopakNastaleeq.ttf"), // Indopak Nastaleeq Font
-    MuhammadiQuranicFont: require("./assets/MuhammadiQuranic.ttf"), // Muhammadi Quranic Font
-    "Tajawal-Regular": require("./assets/Tajawal-Regular.ttf"), // Tajawal Regular Font
-    AmiriQuranColored: require("./assets/AmiriQuranColored.ttf"), // Amiri Quran Colored Font
-    ArabQuranIslamic2: require("./assets/ArabQuranIslamic2.ttf"), // Arab Quran Islamic2 Font
-    "al-qalam-quran-majeed-2": require("./assets/al-qalam-quran-majeed-2.ttf"), // al-qalam-quran-majeed-2 Font
+    hafs: require("./assets/Hafs.ttf"),
+    ScheherazadeReg: require("./assets/ScheherazadeReg.ttf"),
+    PFNuyorkArabicRegular: require("./assets/PFNuyorkArabicRegular.ttf"),
+    IndopakNastaleeq: require("./assets/IndopakNastaleeq.ttf"),
+    MuhammadiQuranicFont: require("./assets/MuhammadiQuranic.ttf"),
+    "Tajawal-Regular": require("./assets/Tajawal-Regular.ttf"),
+    AmiriQuranColored: require("./assets/AmiriQuranColored.ttf"),
+    ArabQuranIslamic2: require("./assets/ArabQuranIslamic2.ttf"),
+    "al-qalam-quran-majeed-2": require("./assets/al-qalam-quran-majeed-2.ttf"),
   });
 
   const activeSurah = SURAH_LIST.find((s) => s.id === currentSurahId);
 
+  // Fetch English translation and cache it
+  async function getEnglishTranslation() {
+    try {
+      const cachedTranslation = await AsyncStorage.getItem(ENGLISH_CACHE_KEY);
+
+      // Clear out corrupt or broken cache references
+      if (
+        cachedTranslation &&
+        cachedTranslation !== "undefined" &&
+        cachedTranslation !== "null" &&
+        cachedTranslation.trim() !== ""
+      ) {
+        return JSON.parse(cachedTranslation);
+      }
+
+      console.log("Downloading fresh English translation dataset...");
+      const response = await fetch(
+        "https://api.islamic.app/v1/quran/translations/en-sahih-international",
+      );
+
+      const result = await response.json();
+
+      // Islamic.app returns { data: { verses: [...] } } or { data: [...] }
+      const rawVerses = result?.data?.verses || result?.data || result || [];
+
+      if (Array.isArray(rawVerses) && rawVerses.length > 0) {
+        await AsyncStorage.setItem(
+          ENGLISH_CACHE_KEY,
+          JSON.stringify(rawVerses),
+        );
+        return rawVerses;
+      }
+
+      return [];
+    } catch (error) {
+      console.error("Error fetching translation database:", error);
+      return [];
+    }
+  }
+
   useEffect(() => {
     async function loadSurahData() {
       setLoading(true);
-      const cacheKey = `@surah_data_v2_${currentSurahId}`; // Updated cache key to store translations safely
+
+      // Distinct key to completely ignore old, malformed caches
+      const cacheKey = `@surah_cloud_final_v4_${currentSurahId}`; // Changed v3 to v4
 
       try {
         const cachedData = await AsyncStorage.getItem(cacheKey);
 
         if (cachedData !== null) {
+          console.log("Loading directly from stable cloud cache...");
           setVerses(JSON.parse(cachedData));
           setLoading(false);
         } else {
-          // Added &translations=131 to fetch Dr. Mustafa Khattab's "The Clear Quran"
-          const url = `https://api.quran.com/api/v4/verses/by_chapter/${currentSurahId}?fields=text_qpc_hafs,page_number&translations=131&per_page=300`;
-          const response = await fetch(url);
-          const data = await response.json();
+          // Multi-edition URL: requests both the beautiful text and Sahih International translation together
+          const unifiedUrl = `https://api.alquran.cloud/v1/surah/${currentSurahId}/editions/quran-uthmani,en.sahih`;
 
-          if (data && data.verses) {
-            await AsyncStorage.setItem(cacheKey, JSON.stringify(data.verses));
-            setVerses(data.verses);
+          console.log(
+            "Cache missed! Fetching clean payload from AlQuran Cloud...",
+          );
+          const response = await fetch(unifiedUrl);
+          const result = await response.json();
+
+          // AlQuran Cloud returns data as an array under result.data
+          if (result && result.data && result.data.length === 2) {
+            const arabicSourceArr =
+              result.data[0].ayhas || result.data[0].ayahs || [];
+            const englishSourceArr =
+              result.data[1].ayhas || result.data[1].ayahs || [];
+
+            const processedVerses = arabicSourceArr.map((ayah, index) => {
+              const translationMatch = englishSourceArr[index];
+              let cleanArabicText = ayah.text;
+
+              // If it's the first verse of any Surah EXCEPT Fatihah (1) or Tawbah (9)
+              if (
+                ayah.numberInSurah === 1 &&
+                currentSurahId !== 1 &&
+                currentSurahId !== 9
+              ) {
+                // The Bismillah phrase from this API is exactly 39 characters long including its custom spaces.
+                // We safely chop off the first 39 characters to reveal ONLY the actual verse content.
+                if (cleanArabicText.length > 39) {
+                  cleanArabicText = cleanArabicText.substring(39);
+                }
+              }
+
+              return {
+                id: ayah.number,
+                verse_number: ayah.numberInSurah,
+                verse_key: `${currentSurahId}:${ayah.numberInSurah}`,
+                page_number: ayah.page,
+                text_qpc_hafs: cleanArabicText.trim(), // Cleans up any remaining spaces
+                translation_text: translationMatch ? translationMatch.text : "",
+              };
+            });
+
+            await AsyncStorage.setItem(
+              cacheKey,
+              JSON.stringify(processedVerses),
+            );
+            setVerses(processedVerses);
           } else {
             setVerses([]);
           }
           setLoading(false);
         }
       } catch (err) {
-        console.error("Storage/API Fetch Error: ", err);
+        console.error("Unified Cloud API Fetch Error: ", err);
         setLoading(false);
       }
     }
@@ -84,7 +169,7 @@ export default function App() {
     pagesGroup[pNum].push(ayah);
   });
 
-  // Web-safe font loading checker
+  // Font loading checker
   if (loading || !fontsLoaded) {
     return (
       <View style={styles.center}>
@@ -94,34 +179,41 @@ export default function App() {
     );
   }
 
+  // Helper helper array for mapping our font selections cleanly
+  const fontOptionsList = [
+    { id: "hafs", label: "Hafs Font" },
+    { id: "ScheherazadeReg", label: "Scheherazade Font" },
+    { id: "IndopakNastaleeq", label: "Indopak Nastaleeq" },
+    { id: "PFNuyorkArabicRegular", label: "PF Nuyork Arabic" },
+    { id: "MuhammadiQuranicFont", label: "Muhammadi Quranic" },
+    { id: "Tajawal-Regular", label: "Tajawal Regular" },
+    { id: "ArabQuranIslamic2", label: "Arab Quran Islamic 2" },
+    { id: "AmiriQuranColored", label: "Amiri Quran Colored" },
+    { id: "al-qalam-quran-majeed-2", label: "Al-Qalam Quran Majeed" },
+  ];
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#f9f9f9" />
 
-      {/* Custom Sleek Dropdown Bar Selector */}
-
       {/* Top Bar */}
       <View style={styles.topBar}>
-        {/* Surah Selector */}
         <TouchableOpacity
           style={styles.pickerContainer}
           onPress={() => setDropdownVisible(true)}
           activeOpacity={0.8}
         >
           <Text style={styles.pickerLabel}>Choose Surah:</Text>
-
           <View style={styles.dropdownSelector}>
             <Text style={styles.selectedSurahText}>
               {activeSurah
                 ? `${activeSurah.id}. ${activeSurah.name}`
                 : "Select Surah"}
             </Text>
-
             <Text style={styles.dropdownArrow}>▼</Text>
           </View>
         </TouchableOpacity>
 
-        {/* Settings Button */}
         <TouchableOpacity
           style={styles.settingsButton}
           onPress={() => setSettingsVisible(true)}
@@ -130,7 +222,7 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-      {/* Full Screen Safe Modal List Selection */}
+      {/* Surah Selection Modal */}
       <Modal
         visible={dropdownVisible}
         transparent={true}
@@ -174,6 +266,8 @@ export default function App() {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      {/* Settings Font Modal */}
       <Modal
         visible={settingsVisible}
         transparent={true}
@@ -187,153 +281,40 @@ export default function App() {
         >
           <View style={styles.settingsModal}>
             <Text style={styles.modalTitle}>Choose Arabic Font</Text>
-            <ScrollView
-              showsVerticalScrollIndicator={true}
-              contentContainerStyle={{ paddingBottom: 20 }}
-            >
-              <TouchableOpacity
-                style={[
-                  styles.fontOption,
-                  selectedFont === "hafs" && styles.fontOptionSelected,
-                ]}
-                onPress={() => {
-                  setSelectedFont("hafs");
-                  setSettingsVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-                  Hafs Font
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.fontOption,
-                  selectedFont === "ScheherazadeReg" &&
-                    styles.fontOptionSelected,
-                ]}
-                onPress={() => {
-                  setSelectedFont("ScheherazadeReg");
-                  setSettingsVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-                  Scheherazade Font
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.fontOption,
-                  selectedFont === "IndopakNastaleeq" &&
-                    styles.fontOptionSelected,
-                ]}
-                onPress={() => {
-                  setSelectedFont("IndopakNastaleeq");
-                  setSettingsVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-                  Indopak Nastaleeq Font
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.fontOption,
-                  selectedFont === "PFNuyorkArabicRegular" &&
-                    styles.fontOptionSelected,
-                ]}
-                onPress={() => {
-                  setSelectedFont("PFNuyorkArabicRegular");
-                  setSettingsVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-                  PF Nuyork Arabic Font
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.fontOption,
-                  selectedFont === "MuhammadiQuranicFont" &&
-                    styles.fontOptionSelected,
-                ]}
-                onPress={() => {
-                  setSelectedFont("MuhammadiQuranicFont");
-                  setSettingsVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-                  Muhammadi Quranic Font
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.fontOption,
-                  selectedFont === "Tajawal-Regular" &&
-                    styles.fontOptionSelected,
-                ]}
-                onPress={() => {
-                  setSelectedFont("Tajawal-Regular");
-                  setSettingsVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-                  Tajawal Regular Font
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.fontOption,
-                  selectedFont === "ArabQuranIslamic2" &&
-                    styles.fontOptionSelected,
-                ]}
-                onPress={() => {
-                  setSelectedFont("ArabQuranIslamic2");
-                  setSettingsVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-                  Arab Quran Islamic2 Font
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.fontOption,
-                  selectedFont === "AmiriQuranColored" &&
-                    styles.fontOptionSelected,
-                ]}
-                onPress={() => {
-                  setSelectedFont("AmiriQuranColored");
-                  setSettingsVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-                  Amiri Quran Colored Font
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.fontOption,
-                  selectedFont === "al-qalam-quran-majeed-2" &&
-                    styles.fontOptionSelected,
-                ]}
-                onPress={() => {
-                  setSelectedFont("al-qalam-quran-majeed-2");
-                  setSettingsVisible(false);
-                }}
-              >
-                <Text style={{ fontFamily: selectedFont, fontSize: 18 }}>
-                  Al-Qalam Quran Majeed 2 Font
-                </Text>
-              </TouchableOpacity>
+            <ScrollView showsVerticalScrollIndicator={true}>
+              {fontOptionsList.map((font) => (
+                <TouchableOpacity
+                  key={font.id}
+                  style={[
+                    styles.fontOption,
+                    selectedFont === font.id && styles.fontOptionSelected,
+                  ]}
+                  onPress={() => {
+                    setSelectedFont(font.id);
+                    setSettingsVisible(false);
+                  }}
+                >
+                  <View style={styles.fontOptionRow}>
+                    <Text style={styles.fontLabelText}>{font.label}</Text>
+                    {/* Secure Preview: Only apply script family to actual Arabic characters */}
+                    <Text
+                      style={[
+                        styles.fontPreviewArabic,
+                        { fontFamily: font.id },
+                      ]}
+                    >
+                      القرآن
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </ScrollView>
           </View>
         </TouchableOpacity>
       </Modal>
+
       {/* Main Content View */}
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Header View */}
         <View style={styles.headerBadge}>
           <Text style={styles.headerSubtitle}>SURAH</Text>
           <Text style={styles.headerTitle}>
@@ -345,19 +326,16 @@ export default function App() {
           </Text>
         </View>
 
-        {/* Output Bismillah Header if applicable */}
         {currentSurahId !== 1 && currentSurahId !== 9 ? (
           <Text style={[styles.bismillahText, { fontFamily: selectedFont }]}>
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
           </Text>
         ) : null}
 
-        {/* Map out individual Page Blocks */}
         {Object.keys(pagesGroup).map((pageNumber) => (
           <View key={pageNumber} style={styles.pageBlock}>
-            {/* For readable Translation layout, we loop stacked Ayah blocks */}
             {pagesGroup[pageNumber].map((ayah) => (
-              <View key={ayah.id} style={styles.ayahRowContainer}>
+              <View key={ayah.verse_key} style={styles.ayahRowContainer}>
                 {/* Arabic Text Block */}
                 <Text style={[styles.arabicText, { fontFamily: selectedFont }]}>
                   {ayah.text_qpc_hafs}
@@ -368,15 +346,12 @@ export default function App() {
                 </Text>
 
                 {/* English Translation Block */}
-                {ayah.translations && ayah.translations[0] && (
-                  <Text style={styles.englishText}>
-                    <Text style={styles.englishNumberPrefix}>
-                      {ayah.verse_number}.{" "}
-                    </Text>
-                    {/* Stripping out any accidental inline HTML tags from raw API text data */}
-                    {ayah.translations[0].text.replace(/<[^>]*>/g, "")}
+                <Text style={styles.englishText}>
+                  <Text style={styles.englishNumberPrefix}>
+                    {ayah.verse_number}.{" "}
                   </Text>
-                )}
+                  {ayah.translation_text?.replace(/<[^>]*>/g, "")}
+                </Text>
               </View>
             ))}
 
@@ -407,7 +382,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: "#e7e7e7",
-    // marginHorizontal: 12,
     flex: 1,
     borderRadius: 10,
     marginTop: 2,
@@ -450,6 +424,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   modalTitle: {
     fontSize: 16,
@@ -514,7 +492,6 @@ const styles = StyleSheet.create({
   headerNumber: { fontSize: 13, color: "#666", fontWeight: "500" },
 
   bismillahText: {
-    fontFamily: "hafs",
     fontSize: 34,
     textAlign: "center",
     color: "#2e7d32",
@@ -538,7 +515,6 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   arabicText: {
-    fontFamily: "hafs",
     fontSize: 28,
     textAlign: "right",
     lineHeight: 60,
@@ -585,7 +561,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginTop: 4,
   },
-
   settingsButton: {
     width: 42,
     height: 38,
@@ -597,29 +572,44 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   settingsIcon: {
     fontSize: 18,
   },
-
   settingsModal: {
     width: "85%",
     maxHeight: "80%",
     backgroundColor: "#fff",
     borderRadius: 16,
     padding: 18,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
-
   fontOption: {
-    padding: 16,
+    padding: 14,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: "#e5e5e5",
-    marginTop: 12,
+    marginTop: 10,
   },
-
   fontOptionSelected: {
     backgroundColor: "#e8f5e9",
     borderColor: "#2e7d32",
+  },
+  fontOptionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  fontLabelText: {
+    fontSize: 15,
+    color: "#333",
+    fontWeight: "500",
+  },
+  fontPreviewArabic: {
+    fontSize: 20,
+    color: "#2e7d32",
   },
 });
