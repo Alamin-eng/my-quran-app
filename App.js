@@ -54,7 +54,8 @@ export default function App() {
     AmiriQuranColored: require("./assets/AmiriQuranColored.ttf"),
     ArabQuranIslamic2: require("./assets/ArabQuranIslamic2.ttf"),
     "al-qalam-quran-majeed-2": require("./assets/al-qalam-quran-majeed-2.ttf"),
-    CairoPlayRegular: require("./assets/CairoPlay-Regular.ttf")
+    CairoPlayRegular: require("./assets/CairoPlay-Regular.ttf"),
+    Mada: require("./assets/Mada-Regular.ttf"),
   });
 
   const activeSurah = SURAH_LIST.find((s) => s.id === currentSurahId);
@@ -196,6 +197,8 @@ export default function App() {
     { id: "ArabQuranIslamic2", label: "Arab Quran Islamic 2" },
     { id: "al-qalam-quran-majeed-2", label: "Al Qalam Quran Majeed" },
     { id: "CairoPlayRegular", label: "Cairo Play Regular" },
+    { id: "Mada", label: "Mada" },
+    
   ];
 
   const activeThemeContainer = isDarkMode ? styles.darkContainer : styles.lightContainer;
