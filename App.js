@@ -18,9 +18,11 @@ import { useFonts } from "expo-font";
 // Import your local list of all 114 Surahs
 import { SURAH_LIST } from "./surahs";
 
-// Production Configuration Mapping for Languages
+// Production Configuration Mapping for Languages (Added Bangla & Chinese)
 const LANGUAGES = [
   { id: "en.sahih", label: "English (Sahih Intl)" },
+  { id: "bn.bengali", label: "বাংলা (Muhiuddin Khan)" },
+  { id: "zh.majian", label: "中文 (Ma Jian)" },
   { id: "ur.khan", label: "Urdu (Muhammad Khan)" },
   { id: "tr.ates", label: "Turkish (Suleyman Ates)" },
   { id: "fr.hamidullah", label: "French (Muhammad Hamidullah)" },
@@ -80,7 +82,6 @@ export default function App() {
   useEffect(() => {
     async function loadSurahData() {
       setLoading(true);
-      // Dynamic Key layout incorporating language selection rules
       const cacheKey = `@surah_v12_${selectedLanguage}_${currentSurahId}`;
 
       try {
@@ -90,25 +91,24 @@ export default function App() {
           setVerses(JSON.parse(cachedData));
           setLoading(false);
         } else {
-          // Dynamic edition fetching based on chosen UI settings variable
           const unifiedUrl = `https://api.alquran.cloud/v1/surah/${currentSurahId}/editions/quran-uthmani,${selectedLanguage}`;
           const response = await fetch(unifiedUrl);
           const result = await response.json();
 
           if (result && result.data && result.data.length === 2) {
             const arabicSourceArr = result.data[0].ayahs || [];
-            const englishSourceArr = result.data[1].ayahs || [];
+            const translationSourceArr = result.data[1].ayahs || [];
             const processedVerses = [];
 
             arabicSourceArr.forEach((ayah, index) => {
-              const translationMatch = englishSourceArr[index];
+              const translationMatch = translationSourceArr[index];
               let cleanArabicText = ayah.text;
 
               if (currentSurahId === 1 && ayah.numberInSurah === 1) {
                 const cleanComparison = cleanArabicText.replace(/\uFEFF/g, "").trim();
                 const standardBismillah = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
                 if (cleanComparison === standardBismillah || cleanComparison.includes("بِسْمِ")) {
-                  return; // Skips duplicate row creation perfectly
+                  return; 
                 }
               }
 
@@ -145,7 +145,6 @@ export default function App() {
     loadSurahData();
   }, [currentSurahId, selectedLanguage]);
 
-  // Handle Preference Persistence Changes Safely
   const savePreference = async (key, value) => {
     try {
       await AsyncStorage.setItem(key, value.toString());
@@ -154,10 +153,9 @@ export default function App() {
     }
   };
 
-  // Donation Routing Logic
   const handleDonation = () => {
-    // Replace with your standard PayPal, Stripe, or BuyMeACoffee landing endpoints
-    const donationUrl = "https://www.buymeacoffee.com/yourusername";
+    // 💡 Replace with your personal PayPal, Stripe, or BuyMeACoffee link
+    const donationUrl = "https://www.buymeacoffee.com/";
     Linking.canOpenURL(donationUrl)
       .then((supported) => {
         if (supported) {
@@ -185,15 +183,19 @@ export default function App() {
     );
   }
 
+  // Complete List of All Loaded Fonts
   const fontOptionsList = [
     { id: "hafs", label: "Hafs Font" },
     { id: "ScheherazadeReg", label: "Scheherazade" },
+    { id: "PFNuyorkArabicRegular", label: "PF Nuyork Arabic" },
     { id: "IndopakNastaleeq", label: "Indopak Nastaleeq" },
     { id: "MuhammadiQuranicFont", label: "Muhammadi Quranic" },
     { id: "Tajawal-Regular", label: "Tajawal Regular" },
+    { id: "AmiriQuranColored", label: "Amiri Quran Colored" },
+    { id: "ArabQuranIslamic2", label: "Arab Quran Islamic 2" },
+    { id: "al-qalam-quran-majeed-2", label: "Al Qalam Quran Majeed" },
   ];
 
-  // Structural Theme Wrappers
   const activeThemeContainer = isDarkMode ? styles.darkContainer : styles.lightContainer;
   const activeThemeBlock = isDarkMode ? styles.darkPageBlock : styles.pageBlock;
   const activeArabicText = isDarkMode ? styles.darkArabicText : styles.arabicText;
@@ -203,7 +205,7 @@ export default function App() {
     <SafeAreaView style={[styles.safeArea, isDarkMode && styles.darkBg]}>
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} backgroundColor={isDarkMode ? "#121212" : "#f9f9f9"} />
 
-      {/* Top Bar Navigation layout */}
+      {/* Top Bar Navigation */}
       <View style={[styles.topBar, isDarkMode && styles.darkBg]}>
         <TouchableOpacity
           style={[styles.pickerContainer, isDarkMode && styles.darkBorderBg]}
@@ -253,48 +255,36 @@ export default function App() {
         </TouchableOpacity>
       </Modal>
 
-      {/* Modern Master Controls & Settings Modal Layout */}
+      {/* Settings Modal Layout */}
       <Modal visible={settingsVisible} transparent={true} animationType="fade" onRequestClose={() => setSettingsVisible(false)}>
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setSettingsVisible(false)}>
           <View style={[styles.settingsModal, isDarkMode && styles.darkModalContent]}>
             <Text style={styles.modalTitle}>Display Controls</Text>
             <ScrollView showsVerticalScrollIndicator={false}>
               
-              {/* Theme Selector Switches */}
+              {/* Appearance */}
               <Text style={[styles.sectionLabel, isDarkMode && styles.darkTextHeader]}>Appearance Mode</Text>
               <View style={styles.toggleRow}>
-                <TouchableOpacity 
-                  style={[styles.toggleBtn, !isDarkMode && styles.toggleActive]} 
-                  onPress={() => { setIsDarkMode(false); savePreference("@pref_darkmode", false); }}
-                >
+                <TouchableOpacity style={[styles.toggleBtn, !isDarkMode && styles.toggleActive]} onPress={() => { setIsDarkMode(false); savePreference("@pref_darkmode", false); }}>
                   <Text style={[styles.toggleBtnText, !isDarkMode && styles.toggleActiveText]}>Light</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.toggleBtn, isDarkMode && styles.toggleActive]} 
-                  onPress={() => { setIsDarkMode(true); savePreference("@pref_darkmode", true); }}
-                >
+                <TouchableOpacity style={[styles.toggleBtn, isDarkMode && styles.toggleActive]} onPress={() => { setIsDarkMode(true); savePreference("@pref_darkmode", true); }}>
                   <Text style={[styles.toggleBtnText, isDarkMode && styles.toggleActiveText]}>Dark</Text>
                 </TouchableOpacity>
               </View>
 
-              {/* Translation Display Toggle Switches */}
+              {/* Translation Toggle */}
               <Text style={[styles.sectionLabel, isDarkMode && styles.darkTextHeader]}>Translations Layer</Text>
               <View style={styles.toggleRow}>
-                <TouchableOpacity 
-                  style={[styles.toggleBtn, showTranslation && styles.toggleActive]} 
-                  onPress={() => { setShowTranslation(true); savePreference("@pref_show_trans", true); }}
-                >
+                <TouchableOpacity style={[styles.toggleBtn, showTranslation && styles.toggleActive]} onPress={() => { setShowTranslation(true); savePreference("@pref_show_trans", true); }}>
                   <Text style={[styles.toggleBtnText, showTranslation && styles.toggleActiveText]}>On</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.toggleBtn, !showTranslation && styles.toggleActive]} 
-                  onPress={() => { setShowTranslation(false); savePreference("@pref_show_trans", false); }}
-                >
+                <TouchableOpacity style={[styles.toggleBtn, !showTranslation && styles.toggleActive]} onPress={() => { setShowTranslation(false); savePreference("@pref_show_trans", false); }}>
                   <Text style={[styles.toggleBtnText, !showTranslation && styles.toggleActiveText]}>Off</Text>
                 </TouchableOpacity>
               </View>
 
-              {/* Language Selection Stream */}
+              {/* Language Selector */}
               <Text style={[styles.sectionLabel, isDarkMode && styles.darkTextHeader]}>Translation Language</Text>
               <View style={styles.selectionWrap}>
                 {LANGUAGES.map((lang) => (
@@ -308,9 +298,9 @@ export default function App() {
                 ))}
               </View>
 
-              {/* Script Sizing Configuration Toggles */}
+              {/* Font Size */}
               <Text style={[styles.sectionLabel, isDarkMode && styles.darkTextHeader]}>Arabic Font Sizing</Text>
-              <div style={styles.sizeControlRow}>
+              <View style={styles.sizeControlRow}>
                 <TouchableOpacity style={styles.sizeBtn} onPress={() => setArabicFontSize(Math.max(20, arabicFontSize - 2))}>
                   <Text style={styles.sizeBtnText}>A-</Text>
                 </TouchableOpacity>
@@ -318,9 +308,9 @@ export default function App() {
                 <TouchableOpacity style={styles.sizeBtn} onPress={() => setArabicFontSize(Math.min(44, arabicFontSize + 2))}>
                   <Text style={styles.sizeBtnText}>A+</Text>
                 </TouchableOpacity>
-              </div>
+              </View>
 
-              {/* Script Family Configuration Layout */}
+              {/* Font Typeface */}
               <Text style={[styles.sectionLabel, isDarkMode && styles.darkTextHeader]}>Arabic Font Typeface</Text>
               {fontOptionsList.map((font) => (
                 <TouchableOpacity
@@ -335,12 +325,14 @@ export default function App() {
                 </TouchableOpacity>
               ))}
 
-              {/* Developer Support Donations System Row */}
+              {/* Personalized Support Section */}
               <View style={styles.donationSectionBorder}>
-                <Text style={styles.donationHeadline}>Support App Operations</Text>
-                <Text style={styles.donationSubtitle}>Help us maintain server payloads and keep the application add-free forever.</Text>
+                <Text style={styles.donationHeadline}>Support the Developer</Text>
+                <Text style={styles.donationSubtitle}>
+                  Assalamu Alaikum! This app is developed and maintained entirely by Mohammad Al-Amin. If it has assisted your Quranic studies, consider supporting future development.
+                </Text>
                 <TouchableOpacity style={styles.donationButtonSubmit} onPress={handleDonation}>
-                  <Text style={styles.donationButtonText}>❤️ Secure Donation</Text>
+                  <Text style={styles.donationButtonText}>❤️ Support My Work</Text>
                 </TouchableOpacity>
               </View>
 
@@ -349,7 +341,7 @@ export default function App() {
         </TouchableOpacity>
       </Modal>
 
-      {/* Main Chapter Scroller Content */}
+      {/* Main Chapter Content */}
       <ScrollView style={[styles.container, activeThemeContainer]} showsVerticalScrollIndicator={false}>
         <View style={[styles.headerBadge, isDarkMode && styles.darkHeaderBadge]}>
           <Text style={styles.headerSubtitle}>SURAH</Text>
@@ -370,14 +362,11 @@ export default function App() {
           <View key={pageNumber} style={activeThemeBlock}>
             {pagesGroup[pageNumber].map((ayah) => (
               <View key={ayah.verse_key} style={styles.ayahRowContainer}>
-                
-                {/* Dynamic Sized Arabic Component Text */}
                 <Text style={[activeArabicText, { fontFamily: selectedFont, fontSize: arabicFontSize }]}>
                   {ayah.text_qpc_hafs}
                   <Text style={styles.verseNumberBadge}> ﴿{ayah.verse_number}﴾ </Text>
                 </Text>
 
-                {/* Conditional English/Multilang Render Layer */}
                 {showTranslation && (
                   <Text style={[activeTranslationText, { fontSize: translationFontSize }]}>
                     <Text style={styles.englishNumberPrefix}>{ayah.verse_number}. </Text>
@@ -395,13 +384,17 @@ export default function App() {
           </View>
         ))}
 
-        <View style={{ height: 100 }} />
+        {/* Footer Credit Layer */}
+        <View style={styles.footerDeveloperCredit}>
+          <Text style={[styles.creditText, isDarkMode && styles.darkTextContent]}>Designed & Developed with ❤️ by Mohammad Al-Amin</Text>
+          <Text style={styles.creditSubtext}>May Allah reward your efforts. Ameen.</Text>
+        </View>
+        <View style={{ height: 20 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-// --- Fully Validated Layout Component Configurations ---
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#f9f9f9" },
   topBar: { flexDirection: "row", alignItems: "center", paddingHorizontal: 12, marginTop: 4 },
@@ -421,7 +414,7 @@ const styles = StyleSheet.create({
   selectedSurahText: { fontSize: 14, color: "#b90707", fontWeight: "600" },
   dropdownArrow: { fontSize: 10, color: "#2e7d32" },
   modalOverlay: { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.4)", justifyContent: "center", alignItems: "center" },
-  modalContent: { width: "85%", maxHeight: "70%", backgroundColor: "#fff", borderRadius: 16, padding: 16, boxShadow: "0px 2px 4px rgba(0,0,0,0.2)" },
+  modalContent: { width: "85%", maxHeight: "70%", backgroundColor: "#fff", borderRadius: 16, padding: 16 },
   modalTitle: { fontSize: 18, fontWeight: "bold", color: "#2e7d32", marginBottom: 16, textAlign: "center" },
   modalItem: { paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 },
   modalItemSelected: { backgroundColor: "#e8f5e9" },
@@ -451,7 +444,7 @@ const styles = StyleSheet.create({
   pageFooterText: { fontSize: 11, color: "#999", fontWeight: "700", letterSpacing: 1.5 },
   settingsButton: { width: 42, height: 38, marginLeft: 8, borderRadius: 10, backgroundColor: "#fff", borderWidth: 1, borderColor: "#e7e7e7", justifyContent: "center", alignItems: "center" },
   settingsIcon: { fontSize: 18 },
-  settingsModal: { width: "85%", maxHeight: "80%", backgroundColor: "#fff", borderRadius: 16, padding: 18, boxShadow: "0px 4px 12px rgba(0,0,0,0.15)" },
+  settingsModal: { width: "85%", maxHeight: "80%", backgroundColor: "#fff", borderRadius: 16, padding: 18 },
   sectionLabel: { fontSize: 13, fontWeight: "700", color: "#444", marginTop: 14, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 },
   toggleRow: { flexDirection: "row", backgroundColor: "#f0f0f0", borderRadius: 8, padding: 2, marginBottom: 10 },
   toggleBtn: { flex: 1, paddingVertical: 8, alignItems: "center", borderRadius: 6 },
@@ -477,6 +470,9 @@ const styles = StyleSheet.create({
   donationSubtitle: { fontSize: 11, color: "#5d4037", textAlign: "center", marginVertical: 6, lineHeight: 15 },
   donationButtonSubmit: { backgroundColor: "#f57f17", paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8, marginTop: 4, width: "100%", alignItems: "center" },
   donationButtonText: { color: "#fff", fontWeight: "700", fontSize: 13 },
+  footerDeveloperCredit: { marginTop: 30, alignItems: "center", paddingVertical: 10 },
+  creditText: { fontSize: 13, fontWeight: "600", color: "#555" },
+  creditSubtext: { fontSize: 11, color: "#999", fontStyle: "italic", marginTop: 2 },
   darkBg: { backgroundColor: "#121212" },
   darkBorderBg: { backgroundColor: "#1e1e1e", borderColor: "#2d2d2d" },
   darkTextContent: { color: "#b0b0b0" },
