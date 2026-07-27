@@ -647,7 +647,6 @@ export default function App() {
           </View>
         ))}
 
-        /// Footer Credit component (Not in use but can be utilized directly in app.js by importing this component)
 
         <View style={{ height: 20 }} />
       </ScrollView>
