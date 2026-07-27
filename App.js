@@ -84,7 +84,7 @@ export default function App() {
   useEffect(() => {
     async function loadSurahData() {
       setLoading(true);
-      const cacheKey = `@surah_v12_${selectedLanguage}_${currentSurahId}`;
+      const cacheKey = `@surah_v13_${selectedLanguage}_${currentSurahId}`;
 
       try {
         const cachedData = await AsyncStorage.getItem(cacheKey);
@@ -112,23 +112,19 @@ export default function App() {
                   .trim();
                 const standardBismillah =
                   "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
-                if (
-                  cleanComparison === standardBismillah ||
-                  cleanComparison.includes("بِسْمِ")
-                ) {
-                  return; // Skips extra headers in Surahs 2-114
-                }
-              }
 
-              // Adjust prefix spacing for other Surahs (2-114)
-              if (
-                ayah.numberInSurah === 1 &&
-                currentSurahId !== 1 &&
-                currentSurahId !== 9
-              ) {
-                cleanArabicText = cleanArabicText.replace(/\uFEFF/g, "");
-                if (cleanArabicText.length > 38) {
-                  cleanArabicText = cleanArabicText.substring(38);
+                // If the entire first ayah is just the Bismillah prefix, skip it (for non-Fatiha surahs)
+                if (cleanComparison === standardBismillah) {
+                  return;
+                }
+
+                // If Bismillah is prepended to the first verse (Surahs 2-114 except 9)
+                if (currentSurahId !== 9 && cleanArabicText.includes("بِسْمِ")) {
+                  cleanArabicText = cleanArabicText.replace(/\uFEFF/g, "");
+                  // Trim standard 38-character Bismillah prefix from Ayah 1 of other Surahs
+                  if (cleanArabicText.length > 38) {
+                    cleanArabicText = cleanArabicText.substring(38);
+                  }
                 }
               }
 
@@ -170,7 +166,6 @@ export default function App() {
   };
 
   const handleDonation = () => {
-    // 💡 Replace with your personal PayPal, Stripe, or BuyMeACoffee link
     const donationUrl = "https://www.buymeacoffee.com/";
     Linking.canOpenURL(donationUrl)
       .then((supported) => {
@@ -548,14 +543,13 @@ export default function App() {
                 </TouchableOpacity>
               ))}
 
-              {/* Personalized Support Section */}
+              {/* Support Section */}
               <View style={styles.donationSectionBorder}>
                 <Text style={styles.donationHeadline}>
                   Support the Developer
                 </Text>
                 <Text style={styles.donationSubtitle}>
-                  Assalamu Alaikum! This app is developed and maintained
-                  entirely by Mohammad Al-Amin. If it has assisted your Quranic
+                  Assalamu Alaikum! If this app has assisted your Quranic
                   studies, consider supporting future development.
                 </Text>
                 <TouchableOpacity
@@ -600,6 +594,7 @@ export default function App() {
           </Text>
         </View>
 
+        {/* Display Header Bismillah for Surahs 2 through 114 (except Surah 9) */}
         {currentSurahId !== 1 && currentSurahId !== 9 ? (
           <Text style={[styles.bismillahText, { fontFamily: selectedFont }]}>
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
@@ -646,7 +641,6 @@ export default function App() {
             </View>
           </View>
         ))}
-
 
         <View style={{ height: 20 }} />
       </ScrollView>
