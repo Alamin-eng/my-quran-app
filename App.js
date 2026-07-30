@@ -912,7 +912,7 @@ const styles = StyleSheet.create({
     borderColor: "#fff59d",
     alignItems: "center",
   },
-  donationHeadline: { fontSize: 14, fontWeight: "700", color: "#f57f17" },
+  donationHeadline: { fontSize: 14, fontWeight: "700", color: "#eda260" },
   donationSubtitle: {
     fontSize: 11,
     color: "#5d4037",
@@ -921,7 +921,7 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
   donationButtonSubmit: {
-    backgroundColor: "#f57f17",
+    backgroundColor: "#eda260",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
