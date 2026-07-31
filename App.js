@@ -244,7 +244,7 @@ export default function App() {
           <Text
             style={[styles.pickerLabel, isDarkMode && styles.darkTextContent]}
           >
-            Surah:
+            Select Surah:
           </Text>
           <View style={styles.dropdownSelector}>
             <Text style={styles.selectedSurahText}>
@@ -824,7 +824,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  settingsIcon: { fontSize: 18 },
+  settingsIcon: { 
+    fontSize: 18,
+    color: "#00a066", 
+  },
   settingsModal: {
     width: "85%",
     maxHeight: "80%",
