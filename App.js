@@ -119,7 +119,10 @@ export default function App() {
                 }
 
                 // If Bismillah is prepended to the first verse (Surahs 2-114 except 9)
-                if (currentSurahId !== 9 && cleanArabicText.includes("بِسْمِ")) {
+                if (
+                  currentSurahId !== 9 &&
+                  cleanArabicText.includes("بِسْمِ")
+                ) {
                   cleanArabicText = cleanArabicText.replace(/\uFEFF/g, "");
                   // Trim standard 38-character Bismillah prefix from Ayah 1 of other Surahs
                   if (cleanArabicText.length > 38) {
@@ -261,7 +264,7 @@ export default function App() {
           onPress={() => setSettingsVisible(true)}
         >
           <Text
-            style={[styles.settingsIcon, isDarkMode && styles.darkTextContent]}
+            style={[styles.settingsIcon, isDarkMode && styles.darkSettingsIcon]}
           >
             ⚙
           </Text>
@@ -824,10 +827,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  settingsIcon: { 
-    fontSize: 18,
-    color: "#00a066", 
-  },
+  /* Stylesheet */
+settingsIcon: { 
+  fontSize: 18,
+  color: "#00b070", // Green for Light Mode
+},
+darkSettingsIcon: {
+  color: "#e19a00", // Lighter green (or any color) for Dark Mode
+},
   settingsModal: {
     width: "85%",
     maxHeight: "80%",
