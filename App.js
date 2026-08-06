@@ -13,6 +13,7 @@ import {
   Alert,
   Linking,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
 // Import your local list of all 114 Surahs
@@ -263,11 +264,7 @@ export default function App() {
           style={[styles.settingsButton, isDarkMode && styles.darkBorderBg]}
           onPress={() => setSettingsVisible(true)}
         >
-          <Text
-            style={[styles.settingsIcon, isDarkMode && styles.darkSettingsIcon]}
-          >
-            ⚙
-          </Text>
+         <Ionicons name="settings-outline" size={20} color={isDarkMode ? "#c95c1c" : "#00a066"} />
         </TouchableOpacity>
       </View>
 
