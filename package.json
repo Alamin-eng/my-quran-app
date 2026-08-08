@@ -6,6 +6,7 @@
     "@expo-google-fonts/amiri": "^0.4.1",
     "@expo-google-fonts/noto-naskh-arabic": "^0.4.5",
     "@expo/metro-runtime": "~56.0.13",
+    "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-picker/picker": "2.11.4",
     "expo": "~56.0.12",

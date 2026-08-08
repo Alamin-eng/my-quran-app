@@ -261,10 +261,12 @@ export default function App() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.settingsButton, isDarkMode && styles.darkBorderBg]}
+          style={[styles.settingsButton, isDarkMode && styles.darkBorderBg,
+            { borderColor: isDarkMode ? "#c95c1c" : "#00a066" },
+          ]}
           onPress={() => setSettingsVisible(true)}
         >
-         <Ionicons name="settings-outline" size={20} color={isDarkMode ? "#c95c1c" : "#00a066"} />
+         <Ionicons name="settings-outline" size={20} color={isDarkMode ? "#c95c1c" : "#00a066"}/>
         </TouchableOpacity>
       </View>
 
@@ -665,7 +667,7 @@ const styles = StyleSheet.create({
     borderColor: "#e7e7e7",
     flex: 1,
     borderRadius: 10,
-    height: 38,
+    height: 42,
   },
   pickerLabel: {
     fontSize: 12,
@@ -679,7 +681,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  selectedSurahText: { fontSize: 14, color: "#b90707", fontWeight: "600" },
+  selectedSurahText: { fontSize: 14, color: "#b90707", fontWeight: "700" },
   dropdownArrow: { fontSize: 10, color: "#2e7d32" },
   modalOverlay: {
     flex: 1,
@@ -814,8 +816,8 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   settingsButton: {
-    width: 42,
-    height: 38,
+    width: 40,
+    height: 40,
     marginLeft: 8,
     borderRadius: 10,
     backgroundColor: "#fff",
