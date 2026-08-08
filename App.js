@@ -824,14 +824,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  /* Stylesheet */
-settingsIcon: { 
-  fontSize: 18,
-  color: "#00b070", // Green for Light Mode
-},
-darkSettingsIcon: {
-  color: "#e19a00", // Lighter green (or any color) for Dark Mode
-},
+
   settingsModal: {
     width: "85%",
     maxHeight: "80%",
