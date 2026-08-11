@@ -681,7 +681,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  selectedSurahText: { fontSize: 14, color: "#b90707", fontWeight: "700" },
+  selectedSurahText: { fontSize: 14, color: "#6d038a", fontWeight: "700" },
   dropdownArrow: { fontSize: 10, color: "#2e7d32" },
   modalOverlay: {
     flex: 1,
