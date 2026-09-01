@@ -671,8 +671,8 @@ const styles = StyleSheet.create({
   },
   pickerLabel: {
     fontSize: 12,
-    fontWeight: "700",
-    color: "#333",
+    fontWeight: "800",
+    color: "#7b00af",
     marginRight: 8,
   },
   dropdownSelector: {
@@ -681,7 +681,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  selectedSurahText: { fontSize: 14, color: "#d66000", fontWeight: "700" },
+  selectedSurahText: { fontSize: 14, color: "#024d4c", fontWeight: "700" },
   dropdownArrow: { fontSize: 10, color: "#2e7d32" },
   modalOverlay: {
     flex: 1,
