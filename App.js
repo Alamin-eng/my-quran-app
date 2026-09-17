@@ -251,7 +251,7 @@ export default function App() {
             Select Surah:
           </Text>
           <View style={styles.dropdownSelector}>
-            <Text style={styles.selectedSurahText}>
+            <Text style={[styles.selectedSurahText, isDarkMode && styles.selectSurahDarkText]}>
               {activeSurah
                 ? `${activeSurah.id}. ${activeSurah.name}`
                 : "Select Surah"}
@@ -681,7 +681,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  selectedSurahText: { fontSize: 14, color: "#024d4c", fontWeight: "700" },
+  selectedSurahText: { fontSize: 14, color: "#018785", fontWeight: "700" },
   dropdownArrow: { fontSize: 10, color: "#2e7d32" },
   modalOverlay: {
     flex: 1,
@@ -946,6 +946,7 @@ const styles = StyleSheet.create({
   },
   darkBg: { backgroundColor: "#121212" },
   darkBorderBg: { backgroundColor: "#1e1e1e", borderColor: "#2d2d2d" },
+  selectSurahDarkText: { color: "#051fad" },
   darkTextContent: { color: "#b0b0b0" },
   darkTextHeader: { color: "#fff" },
   darkModalContent: { backgroundColor: "#1e1e1e" },
