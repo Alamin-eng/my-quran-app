@@ -946,7 +946,7 @@ const styles = StyleSheet.create({
   },
   darkBg: { backgroundColor: "#121212" },
   darkBorderBg: { backgroundColor: "#1e1e1e", borderColor: "#2d2d2d" },
-  selectSurahDarkText: { color: "#e0b830" },
+  selectSurahDarkText: { color: "#e9be30" },
   darkTextContent: { color: "#b0b0b0" },
   darkTextHeader: { color: "#fff" },
   darkModalContent: { backgroundColor: "#1e1e1e" },
