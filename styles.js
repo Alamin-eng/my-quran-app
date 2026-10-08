@@ -295,6 +295,30 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     marginTop: 2,
   },
+// all codes below after app.js clean up to seperate styles file
+modalHeader: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: 12,
+  paddingBottom: 8,
+  borderBottomWidth: 1,
+  borderBottomColor: "#eeeeee",
+},
+modalTitle: {
+  fontSize: 18,
+  fontWeight: "bold",
+  color: "#2e7d32",
+},
+closeButton: {
+  padding: 4,
+  borderRadius: 16,
+  backgroundColor: "rgba(0,0,0,0.05)",
+},
+
+// all codes above after app.js clean up to seperate styles file
+
+// Dark Mode Styles
   darkBg: { backgroundColor: "#121212" },
   darkBorderBg: { backgroundColor: "#1e1e1e", borderColor: "#2d2d2d" },
   selectSurahDarkText: { color: "#e9be30" },
