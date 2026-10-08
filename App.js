@@ -60,6 +60,7 @@ export default function App() {
     "al-qalam-quran": require("./assets/Al Qalam Quran.ttf"),
     CairoPlayRegular: require("./assets/CairoPlay-Regular.ttf"),
     Mada: require("./assets/Mada-Regular.ttf"),
+    me_quran: require("./assets/Me Quran.ttf"),
   });
 
   const activeSurah = SURAH_LIST.find((s) => s.id === currentSurahId);
@@ -224,6 +225,7 @@ export default function App() {
     { id: "al-qalam-quran", label: "Al Qalam Quran" },
     { id: "CairoPlayRegular", label: "Cairo Play Regular" },
     { id: "Mada", label: "Mada" },
+    { id: "me_quran", label: "Me Quran" },
   ];
 
   const activeThemeContainer = isDarkMode
