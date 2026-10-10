@@ -50,7 +50,8 @@ export default function App() {
 
   let [fontsLoaded] = useFonts({
     hafs: require("./assets/Hafs.ttf"),
-    ScheherazadeReg: require("./assets/ScheherazadeReg.ttf"),
+    "NotoNaskhArabic-Reg": require("./assets/NotoNaskhArabic-Reg.ttf"),
+    "ScheherazadeNew-Reg": require("./assets/ScheherazadeNew-Reg.ttf"),
     PFNuyorkArabicRegular: require("./assets/PFNuyorkArabicRegular.ttf"),
     IndopakNastaleeq: require("./assets/IndopakNastaleeq.ttf"),
     KfgqpcHafsUthmanic: require("./assets/KfgqpcHafsUthmanic.ttf"),
@@ -214,7 +215,8 @@ export default function App() {
   // Complete List of All Loaded Fonts
   const fontOptionsList = [
     { id: "hafs", label: "Hafs Font" },
-    { id: "ScheherazadeReg", label: "Scheherazade" },
+    { id: "NotoNaskhArabic-Reg", label: "Noto Naskh Arabic" },
+    { id: "ScheherazadeNew-Reg", label: "Scheherazade New" },
     { id: "PFNuyorkArabicRegular", label: "PF Nuyork Arabic" },
     { id: "IndopakNastaleeq", label: "Indopak Nastaleeq" },
     { id: "KfgqpcHafsUthmanic", label: "KFGQPC Hafs Uthmanic" },
