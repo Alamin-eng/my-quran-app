@@ -326,7 +326,7 @@ closeButton: {
   darkTextHeader: { color: "#f5f0f0" },
   darkModalContent: { backgroundColor: "#1e1e1e" },
   darkFontOption: { borderColor: "#2d2d2d" },
-  darkHeaderBadge: { backgroundColor: "#1b2e1c", borderColor: "#2e7d32" },
+  darkHeaderBadge: { backgroundColor: "#1b311c", borderColor: "#2e7d32" },
 });
 
 
