@@ -321,7 +321,7 @@ closeButton: {
 // Dark Mode Styles
   darkBg: { backgroundColor: "#121212" },
   darkBorderBg: { backgroundColor: "#1e1e1e", borderColor: "#2d2d2d" },
-  selectSurahDarkText: { color: "#e5bb30" },
+  selectSurahDarkText: { color: "#dab230" },
   darkTextContent: { color: "#b0b0b0" },
   darkTextHeader: { color: "#f5f0f0" },
   darkModalContent: { backgroundColor: "#1e1e1e" },
