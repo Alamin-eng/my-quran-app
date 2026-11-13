@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   bismillahText: {
     fontSize: 34,
     textAlign: "center",
-    color: "#2e7d32",
+    color: "#0074a2",
     marginVertical: 25,
     lineHeight: 52,
   },
